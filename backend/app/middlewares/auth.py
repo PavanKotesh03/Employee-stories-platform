@@ -57,7 +57,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # 1. Single Source of Truth Bypass
         if settings.ENVIRONMENT == "local":
-            request.state.user_id = "mock-dev-user-id"
+            request.state.user_id = "123e4567-e89b-12d3-a456-426614174000"
             request.state.user_role = "admin"
             return await call_next(request)
 

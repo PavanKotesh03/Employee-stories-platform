@@ -17,7 +17,7 @@ async def login():
     # Mock behavior for local development
     if settings.ENVIRONMENT == "local":
         payload = {
-            "sub": "mock-dev-user-id",
+            "sub": "123e4567-e89b-12d3-a456-426614174000",
             "role": "admin",
             "exp": int(time.time()) + 3600
         }
@@ -33,7 +33,7 @@ async def callback(code: str = "mock_code"):
     # Mock behavior for local development
     if settings.ENVIRONMENT == "local":
         payload = {
-            "sub": "mock-dev-user-id",
+            "sub": "123e4567-e89b-12d3-a456-426614174000",
             "role": "admin",
             "exp": int(time.time()) + 3600
         }
