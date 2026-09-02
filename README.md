@@ -75,8 +75,8 @@ The frontend is responsible for:
 ### Clone the repository
 
 ```bash
-git clone https://github.com/PavanKotesh03/employee-story-platform.git
-cd employee-story-platform
+git clone https://github.com/PavanKotesh03/Employee-stories-platform.git
+cd Employee-storyies-platform
 ```
 
 ### Backend
