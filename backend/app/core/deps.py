@@ -7,6 +7,7 @@ from uuid import uuid4
 from app.core.security import get_current_user, UserInfo
 from app.core.database import get_db_session
 from app.models.user import User, UserRole
+from app.utils.constants import ADMIN_EMAILS, HR_EMAILS
 
 async def get_current_user_with_level(
     user_info: UserInfo = Depends(get_current_user),
@@ -24,13 +25,19 @@ async def get_current_user_with_level(
         
     # 2. Auto-create if entirely missing
     if not db_user:
+        assigned_role = UserRole.employee
+        if user_info.email in ADMIN_EMAILS:
+            assigned_role = UserRole.admin
+        elif user_info.email in HR_EMAILS:
+            assigned_role = UserRole.hr
+            
         db_user = User(
             id=uuid4(),
             employee_id=f"EMP-{str(uuid4())[:8].upper()}",
             full_name=user_info.username,
             email=user_info.email,
             idpsubjectid=user_info.user_id,
-            role=UserRole.employee
+            role=assigned_role
         )
         db.add(db_user)
         try:

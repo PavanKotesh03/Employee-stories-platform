@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 function LandingNavbar() {
   return (
@@ -11,6 +11,7 @@ function LandingNavbar() {
 }
 
 function HeroSection() {
+  const { login } = useAuth();
   return (
     <section className="flex-1 flex flex-col items-center justify-center text-center px-6 py-12 w-full max-w-4xl mx-auto">
       <h1 style={{ color: 'var(--primary-text-color)' }} className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
@@ -22,11 +23,9 @@ function HeroSection() {
       <p style={{ color: 'var(--grey-font-color)' }} className="text-lg md:text-xl max-w-2xl leading-relaxed mb-10">
         Our platform empowers you to document your unique journeys, share your achievements, outline your challenges, and highlight your learnings. Join us to make your experiences part of our organization's shared knowledge.
       </p>
-      <Link to="/login">
-        <button style={{ backgroundColor: 'var(--primary-color)', color: 'var(--primary-white-color)' }} className="rt-BaseButton hover:opacity-90 transition-opacity text-base px-8 py-3 h-auto rounded-md shadow-sm border-none">
-          Continue with SSO
-        </button>
-      </Link>
+      <button onClick={login} style={{ backgroundColor: 'var(--primary-color)', color: 'var(--primary-white-color)' }} className="rt-BaseButton cursor-pointer hover:opacity-90 transition-opacity text-base px-8 py-3 h-auto rounded-md shadow-sm border-none">
+        Continue with SSO
+      </button>
     </section>
   )
 }

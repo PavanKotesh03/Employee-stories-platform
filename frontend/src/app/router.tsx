@@ -1,17 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LandingPage from '../pages/LandingPage'
 import AppLayout from '../components/layout/AppLayout'
+import RoleGuard from '../components/layout/RoleGuard'
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        {/* Placeholder for CTA login route */}
-        <Route path="/login" element={<div className="flex h-screen items-center justify-center">Login Page Placeholder</div>} />
-        
         {/* Authenticated Application Shell */}
-        <Route path="/app" element={<AppLayout />}>
+        <Route path="/app" element={<RoleGuard><AppLayout /></RoleGuard>}>
           <Route index element={
             <div>
               <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>Home Dashboard</h1>
