@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom'
 export default function Sidebar() {
   const navItems = [
     { label: 'Home', path: '/app' },
-    { label: 'Stories', path: '/app/stories' },
-    { label: 'My Story', path: '/app/my-story' },
+    { label: 'My Stories', path: '/app/stories' },
+    { label: 'Discover', path: '/app/discover' },
     { label: 'Profile', path: '/app/profile' },
   ]
 

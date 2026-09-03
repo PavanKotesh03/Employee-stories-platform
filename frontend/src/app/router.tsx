@@ -1,7 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LandingPage from '../pages/LandingPage'
 import AppLayout from '../components/layout/AppLayout'
-import RoleGuard from '../components/layout/RoleGuard'
+import HomePage from '../pages/HomePage'
+import MyStoriesPage from '../pages/MyStoriesPage'
+import CreateStoryPage from '../pages/CreateStoryPage'
+import StoryDetailsPage from '../pages/StoryDetailsPage'
+import EditStoryPage from '../pages/EditStoryPage'
 
 export function AppRouter() {
   return (
@@ -9,23 +13,16 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         {/* Authenticated Application Shell */}
-        <Route path="/app" element={<RoleGuard><AppLayout /></RoleGuard>}>
-          <Route index element={
+        <Route path="/app" element={<AppLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="stories" element={<MyStoriesPage />} />
+          <Route path="stories/new" element={<CreateStoryPage />} />
+          <Route path="stories/:storyId" element={<StoryDetailsPage />} />
+          <Route path="stories/:storyId/edit" element={<EditStoryPage />} />
+          <Route path="discover" element={
             <div>
-              <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>Home Dashboard</h1>
-              <p style={{ color: 'var(--grey-font-color)' }}>Welcome to the Employee Story Platform.</p>
-            </div>
-          } />
-          <Route path="stories" element={
-            <div>
-              <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>Stories</h1>
+              <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>Discover Stories</h1>
               <p style={{ color: 'var(--grey-font-color)' }}>Company stories will be listed here.</p>
-            </div>
-          } />
-          <Route path="my-story" element={
-            <div>
-              <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>My Story</h1>
-              <p style={{ color: 'var(--grey-font-color)' }}>Edit your story here.</p>
             </div>
           } />
           <Route path="profile" element={

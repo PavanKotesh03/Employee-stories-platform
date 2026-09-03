@@ -7,17 +7,17 @@ export default function Navbar() {
         {/* Mobile menu button could go here in the future */}
         <Link to="/app">Employee Story Platform</Link>
       </div>
-      
+
       <div className="flex items-center gap-4 cursor-pointer">
         <div className="flex flex-col text-right hidden sm:flex">
-          <span className="text-sm font-medium">Jane Doe</span>
+          <span className="text-sm font-medium">aditya.ranjan@triconinfotech.com</span>
           <span style={{ color: 'var(--light-grey-font-color)' }} className="text-xs">Employee</span>
         </div>
-        <div 
-          style={{ backgroundColor: 'var(--primary-white-color)', color: 'var(--primary-text-color)' }} 
+        <div
+          style={{ backgroundColor: 'var(--primary-white-color)', color: 'var(--primary-text-color)' }}
           className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shadow-sm"
         >
-          JD
+          AR
         </div>
       </div>
     </nav>
