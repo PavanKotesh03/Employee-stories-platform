@@ -1,0 +1,32 @@
+body {
+background-color: #EDEDEE;
+}
+
+.primary-color {
+box-shadow: 0 0 0 2px black, black;
+border: 1px solid;
+border-color: black;
+border-radius: 10px;
+}
+
+.rt-BaseButton {
+height: 30px;
+color: black;
+font-size: 14px;
+font-weight: 600;
+margin-left: 20px;
+margin-right: 20px;
+border-radius: 3px;
+}
+
+.rt-BaseButton:hover {
+background-color: #DBDCDE;
+}
+
+p {
+line-height: 1.5;
+}
+
+.revert-all > * {
+all: revert;
+}
