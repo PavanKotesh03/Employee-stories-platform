@@ -1,30 +1,27 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addStory, Story, StoryStatus } from '../data/mockStories';
+import { storyApi } from '../api/storyApi';
 
-export type StoryFormData = Omit<Story, 'id' | 'employeeId' | 'employeeName' | 'designation' | 'status' | 'rejectionReason'>;
+
+export type StoryFormData = Record<string, string>;
 
 interface StoryFormProps {
+  initialTitle?: string;
   initialData?: Partial<StoryFormData>;
-  onSubmit: (data: StoryFormData, action: 'DRAFT' | 'PENDING_REVIEW') => void;
+  onSubmit: (title: string, data: StoryFormData, action: 'DRAFT' | 'PENDING_REVIEW') => void;
   isEdit?: boolean;
 }
 
-export const StoryForm = ({ initialData = {}, onSubmit, isEdit = false }: StoryFormProps) => {
+export const StoryForm = ({ initialTitle = '', initialData = {}, onSubmit, isEdit = false }: StoryFormProps) => {
+  const [title, setTitle] = useState(initialTitle);
   const [formData, setFormData] = useState<StoryFormData>({
     journey: initialData.journey || '',
+    teamAndPeople: initialData.teamAndPeople || '',
     achievements: initialData.achievements || '',
-    peopleAndRelationships: initialData.peopleAndRelationships || '',
     challenges: initialData.challenges || '',
-    organizationalCulture: initialData.organizationalCulture || '',
-    outsideWork: initialData.outsideWork || '',
-    suggestions: initialData.suggestions || '',
-    memorableExperience: initialData.memorableExperience || '',
-    peopleWhoInfluencedMe: initialData.peopleWhoInfluencedMe || '',
-    biggestChallenge: initialData.biggestChallenge || '',
-    culture: initialData.culture || '',
-    personalInterests: initialData.personalInterests || '',
-    additionalSuggestion: initialData.additionalSuggestion || ''
+    organizationAndCulture: initialData.organizationAndCulture || '',
+    personalSide: initialData.personalSide || '',
+    suggestions: initialData.suggestions || ''
   });
 
   const handleChange = (field: keyof StoryFormData, value: string) => {
@@ -33,7 +30,11 @@ export const StoryForm = ({ initialData = {}, onSubmit, isEdit = false }: StoryF
 
   const handleAction = (e: FormEvent, action: 'DRAFT' | 'PENDING_REVIEW') => {
     e.preventDefault();
-    onSubmit(formData, action);
+    if (!title.trim()) {
+      alert("Please enter a title for your story.");
+      return;
+    }
+    onSubmit(title, formData, action);
   };
 
   const renderField = (name: keyof StoryFormData, label: string, placeholder: string) => (
@@ -52,42 +53,27 @@ export const StoryForm = ({ initialData = {}, onSubmit, isEdit = false }: StoryF
 
   return (
     <form className="bg-[var(--primary-white-color)] p-8 md:p-12 rounded-xl shadow-sm border border-[var(--light-grey-font-color)]">
-      <div className="mb-10 p-6 bg-[var(--sidebar-bg-color)] rounded-lg border border-[var(--light-grey-font-color)]">
-        <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>Employee Profile</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <span className="block text-xs font-semibold text-[var(--grey-font-color)] uppercase tracking-wider mb-1">Name</span>
-            <span className="font-medium text-[var(--primary-text-color)]">Aditya Ranjan</span>
-          </div>
-          <div>
-            <span className="block text-xs font-semibold text-[var(--grey-font-color)] uppercase tracking-wider mb-1">Designation</span>
-            <span className="font-medium text-[var(--primary-text-color)]">Platform Engineer II</span>
-          </div>
-          <div>
-            <span className="block text-xs font-semibold text-[var(--grey-font-color)] uppercase tracking-wider mb-1">Employee ID</span>
-            <span className="font-medium text-[var(--primary-text-color)]">3094</span>
-          </div>
-        </div>
-      </div>
+
 
       <div className="mb-8">
-        <h3 className="text-xl font-bold mb-6 border-b border-[var(--light-grey-font-color)] pb-2" style={{ color: 'var(--primary-text-color)' }}>
-          Story Sections
-        </h3>
-        
-        {renderField('journey', 'Journey', 'Describe your career journey and learning experiences...')}
+        <label className="block text-[var(--primary-text-color)] font-bold mb-2">
+          Story Title <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="e.g. My Incredible Journey at Tricon"
+          className="w-full p-4 rounded-md border border-[var(--light-grey-font-color)] bg-[var(--primary-white-color)] text-[var(--font-color)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-shadow mb-8"
+        />
+
+        {renderField('journey', 'Career Journey', 'Describe your career journey and learning experiences...')}
+        {renderField('teamAndPeople', 'Team & People', 'How has collaboration and teamwork impacted your experience?')}
         {renderField('achievements', 'Achievements', 'What are your key achievements and memorable professional experiences?')}
-        {renderField('peopleAndRelationships', 'People & Relationships', 'How has collaboration and teamwork impacted your experience?')}
         {renderField('challenges', 'Challenges', 'Describe a challenge you faced and how you handled it...')}
-        {renderField('organizationalCulture', 'Organizational Culture', 'How would you describe the organization\'s culture and learning opportunities?')}
-        {renderField('outsideWork', 'Outside Work', 'What do you enjoy doing outside of work?')}
+        {renderField('organizationAndCulture', 'Organization & Culture', 'How would you describe the organization\'s culture and learning opportunities?')}
+        {renderField('personalSide', 'Personal Side', 'What do you enjoy doing outside of work?')}
         {renderField('suggestions', 'Suggestions', 'Do you have any suggestions to improve the employee experience?')}
-        {renderField('memorableExperience', 'Memorable Experience', 'Describe a memorable professional moment...')}
-        {renderField('peopleWhoInfluencedMe', 'People Who Influenced Me', 'Who has influenced your professional journey?')}
-        {renderField('biggestChallenge', 'Biggest Challenge', 'What was your biggest challenge and what did you learn from it?')}
-        {renderField('culture', 'Culture', 'How do you perceive the overall company culture?')}
-        {renderField('personalInterests', 'Personal Interests', 'What are your personal interests and hobbies?')}
-        {renderField('additionalSuggestion', 'Additional Suggestion', 'Any other thoughts or suggestions?')}
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-4 mt-10 pt-6 border-t border-[var(--light-grey-font-color)]">
@@ -112,19 +98,22 @@ export const StoryForm = ({ initialData = {}, onSubmit, isEdit = false }: StoryF
 
 export default function CreateStoryPage() {
   const navigate = useNavigate();
-  const currentEmployeeId = '3094';
-  const currentEmployeeName = 'Aditya Ranjan';
-  const currentDesignation = 'Platform Engineer II';
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (data: StoryFormData, action: 'DRAFT' | 'PENDING_REVIEW') => {
-    addStory({
-      employeeId: currentEmployeeId,
-      employeeName: currentEmployeeName,
-      designation: currentDesignation,
-      status: action,
-      ...data
-    });
-    navigate('/app/stories');
+  const handleSubmit = async (title: string, data: StoryFormData, action: 'DRAFT' | 'PENDING_REVIEW') => {
+    try {
+      setSubmitting(true);
+      const story = await storyApi.createStory({ title, content: data, status: 'DRAFT' });
+      if (action === 'PENDING_REVIEW') {
+        await storyApi.submitStoryForReview(story.id);
+      }
+      navigate('/app/stories');
+    } catch (e) {
+      console.error("Failed to create story:", e);
+      alert("Failed to create story. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

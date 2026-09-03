@@ -1,14 +1,42 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStories } from '../data/mockStories';
+import { storyApi, Story } from '../api/storyApi';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function HomePage() {
-  const employeeData = getStories();
-  const currentUser = employeeData.find(e => e.employeeId === '3094');
+  const { user } = useAuth();
+  const [publishedStories, setPublishedStories] = useState<Story[]>([]);
+  const [myStories, setMyStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const [published, mine] = await Promise.all([
+          storyApi.getPublishedStories(),
+          storyApi.getMyStories()
+        ]);
+        setPublishedStories(published);
+        setMyStories(mine);
+      } catch (error) {
+        console.error("Failed to fetch stories", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStories();
+  }, []);
+
+  const myActiveStory = myStories[0];
+
+  if (loading) {
+    return <div className="p-8 text-center" style={{ color: 'var(--grey-font-color)' }}>Loading dashboard...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-10 max-w-5xl mx-auto pb-12 w-full">
       {/* Welcome Section */}
-      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-xl shadow-sm border border-[var(--light-grey-font-color)] bg-[var(--primary-white-color)]">
+      {/* <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-xl shadow-sm border border-[var(--light-grey-font-color)] bg-[var(--primary-white-color)]">
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold bg-[var(--light-grey-font-color)] text-[var(--primary-text-color)] shrink-0">
             AR
@@ -35,7 +63,7 @@ export default function HomePage() {
             </button>
           </Link>
         </div>
-      </section>
+      </section> */}
 
       {/* Quick Actions */}
       <section>
@@ -58,28 +86,30 @@ export default function HomePage() {
       </section>
 
       {/* My Story Section */}
+      {myActiveStory && (
       <section>
         <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>My Story</h2>
         <div className="p-6 rounded-xl border border-[var(--light-grey-font-color)] bg-[var(--primary-white-color)] shadow-sm">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
             <div>
               <h3 className="text-lg font-bold" style={{ color: 'var(--primary-text-color)' }}>My Career Journey at Tricon</h3>
-              <p className="text-sm font-medium" style={{ color: 'var(--primary-color)' }}>{currentUser.name} &bull; {currentUser.designation}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--primary-color)' }}>{user?.name}</p>
             </div>
             <span className="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
-              Pending HR Review
+              {myActiveStory.status}
             </span>
           </div>
           <p className="text-[var(--grey-font-color)] text-sm leading-relaxed mb-6 line-clamp-3">
-            {currentUser.journey}
+            {myActiveStory.content?.journey || "No journey content yet."}
           </p>
-          <Link to="/app/stories/story-2">
+          <Link to={`/app/stories/${myActiveStory.id}`}>
             <button className="text-sm font-semibold hover:underline" style={{ color: 'var(--primary-color)' }}>
               View My Story &rarr;
             </button>
           </Link>
         </div>
       </section>
+      )}
 
       {/* Discover Stories Section */}
       <section>
@@ -90,16 +120,15 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {employeeData.map((emp) => (
-            <div key={emp.employeeId} className="flex flex-col p-6 rounded-xl border border-[var(--light-grey-font-color)] bg-[var(--primary-white-color)] shadow-sm">
+          {publishedStories.map((story) => (
+            <div key={story.id} className="flex flex-col p-6 rounded-xl border border-[var(--light-grey-font-color)] bg-[var(--primary-white-color)] shadow-sm">
               <div className="mb-3">
-                <h3 className="text-base font-bold" style={{ color: 'var(--primary-text-color)' }}>{emp.name}</h3>
-                <p className="text-xs font-medium" style={{ color: 'var(--primary-color)' }}>{emp.designation}</p>
+                <h3 className="text-base font-bold" style={{ color: 'var(--primary-text-color)' }}>{story.author?.full_name || 'Anonymous'}</h3>
               </div>
               <p className="text-[var(--grey-font-color)] text-sm leading-relaxed mb-5 line-clamp-3 flex-1">
-                "{emp.journey}"
+                "{story.content?.journey || 'No content'}"
               </p>
-              <Link to={`/app/stories/${emp.id}`}>
+              <Link to={`/app/stories/${story.id}`}>
                 <button className="text-sm font-semibold hover:underline" style={{ color: 'var(--primary-color)' }}>
                   View Story &rarr;
                 </button>

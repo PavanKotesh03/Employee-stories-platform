@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getStoryById, StoryStatus } from '../data/mockStories';
+import { storyApi, Story } from '../api/storyApi';
+import { useAuth } from '../contexts/AuthContext';
 
-const StatusBadge = ({ status }: { status: StoryStatus }) => {
+const StatusBadge = ({ status }: { status: string }) => {
   switch (status) {
     case 'APPROVED':
       return <span className="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">Approved</span>;
@@ -17,13 +19,33 @@ const StatusBadge = ({ status }: { status: StoryStatus }) => {
 
 export default function StoryDetailsPage() {
   const { storyId } = useParams();
-  const story = getStoryById(storyId || '');
-  const currentEmployeeId = '3094';
+  const { user } = useAuth();
+  const [story, setStory] = useState<Story | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStory = async () => {
+      if (!storyId) return;
+      try {
+        const data = await storyApi.getStoryById(storyId);
+        setStory(data);
+      } catch (error) {
+        console.error("Failed to fetch story", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStory();
+  }, [storyId]);
+
+  if (loading) {
+    return <div className="p-8 text-center" style={{ color: 'var(--grey-font-color)' }}>Loading story...</div>;
+  }
 
   if (!story) {
     return (
       <div className="max-w-4xl mx-auto py-12 text-center">
-        <h1 className="text-2xl font-bold mb-4">Story Not Found</h1>
+        <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--primary-text-color)' }}>Story Not Found</h1>
         <Link to="/app/stories" className="text-[var(--primary-color)] hover:underline">
           &larr; Back to My Stories
         </Link>
@@ -31,7 +53,7 @@ export default function StoryDetailsPage() {
     );
   }
 
-  const isOwner = story.employeeId === currentEmployeeId;
+  const isOwner = story.employee_id === user?.id;
   const canEdit = isOwner && (story.status === 'DRAFT' || story.status === 'REJECTED');
 
   const renderSection = (title: string, content?: string) => {
@@ -58,13 +80,10 @@ export default function StoryDetailsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start mb-10 gap-6">
           <div>
             <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--primary-text-color)' }}>
-              {story.employeeName}
+              {story.title}
             </h1>
-            <p className="text-lg font-medium mb-1" style={{ color: 'var(--primary-color)' }}>
-              {story.designation}
-            </p>
-            <p className="text-sm text-[var(--grey-font-color)]">
-              Employee ID: {story.employeeId}
+            <p className="text-sm text-[var(--grey-font-color)] mb-1">
+              By: {story.author?.full_name || 'Anonymous'}
             </p>
           </div>
           <div className="flex flex-col items-end gap-4">
@@ -79,27 +98,21 @@ export default function StoryDetailsPage() {
           </div>
         </div>
 
-        {story.status === 'REJECTED' && story.rejectionReason && (
+        {story.status === 'REJECTED' && story.review_comment && (
           <div className="mb-10 p-5 rounded-lg bg-red-50 border border-red-200 text-red-900">
             <h3 className="font-bold mb-2">HR Feedback</h3>
-            <p className="text-sm">{story.rejectionReason}</p>
+            <p className="text-sm">{story.review_comment}</p>
           </div>
         )}
 
         <div className="story-content">
-          {renderSection('Journey', story.journey)}
-          {renderSection('Achievements', story.achievements)}
-          {renderSection('People & Relationships', story.peopleAndRelationships)}
-          {renderSection('Challenges', story.challenges)}
-          {renderSection('Organizational Culture', story.organizationalCulture)}
-          {renderSection('Outside Work', story.outsideWork)}
-          {renderSection('Suggestions', story.suggestions)}
-          {renderSection('Memorable Experience', story.memorableExperience)}
-          {renderSection('People Who Influenced Me', story.peopleWhoInfluencedMe)}
-          {renderSection('Biggest Challenge', story.biggestChallenge)}
-          {renderSection('Culture', story.culture)}
-          {renderSection('Personal Interests', story.personalInterests)}
-          {renderSection('Additional Suggestion', story.additionalSuggestion)}
+          {renderSection('Career Journey', story.content?.journey)}
+          {renderSection('Team & People', story.content?.teamAndPeople)}
+          {renderSection('Achievements', story.content?.achievements)}
+          {renderSection('Challenges', story.content?.challenges)}
+          {renderSection('Organization & Culture', story.content?.organizationAndCulture)}
+          {renderSection('Personal Side', story.content?.personalSide)}
+          {renderSection('Suggestions', story.content?.suggestions)}
         </div>
       </div>
     </div>

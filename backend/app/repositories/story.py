@@ -28,6 +28,7 @@ class StoryRepository(BaseRepository[Story, StoryCreate, StoryUpdate]):
     async def get_by_employee(self, db: AsyncSession, employee_id: UUID, skip: int = 0, limit: int = 20) -> List[Story]:
         result = await db.execute(
             select(Story)
+            .options(selectinload(Story.author))
             .filter(Story.employee_id == employee_id, Story.is_deleted == False)
             .order_by(Story.created_at.desc())
             .offset(skip)

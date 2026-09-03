@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStoriesByEmployee, StoryStatus } from '../data/mockStories';
+import { storyApi, Story } from '../api/storyApi';
+import { useAuth } from '../contexts/AuthContext';
 
-const StatusBadge = ({ status }: { status: StoryStatus }) => {
+const StatusBadge = ({ status }: { status: string }) => {
   switch (status) {
     case 'APPROVED':
       return <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">Approved</span>;
@@ -16,8 +18,27 @@ const StatusBadge = ({ status }: { status: StoryStatus }) => {
 };
 
 export default function MyStoriesPage() {
-  const currentEmployeeId = '3094';
-  const myStories = getStoriesByEmployee(currentEmployeeId);
+  const { user } = useAuth();
+  const [myStories, setMyStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMyStories = async () => {
+      try {
+        const data = await storyApi.getMyStories();
+        setMyStories(data);
+      } catch (error) {
+        console.error("Failed to fetch my stories", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMyStories();
+  }, []);
+
+  if (loading) {
+    return <div className="p-8 text-center max-w-5xl mx-auto w-full pb-12 text-[var(--grey-font-color)]">Loading your stories...</div>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto w-full pb-12">
@@ -58,12 +79,12 @@ export default function MyStoriesPage() {
             <div key={story.id} className="p-6 rounded-xl border border-[var(--light-grey-font-color)] bg-[var(--primary-white-color)] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
-                  <h3 className="text-lg font-bold" style={{ color: 'var(--primary-text-color)' }}>My Career Journey at Tricon</h3>
+                  <h3 className="text-lg font-bold" style={{ color: 'var(--primary-text-color)' }}>{story.title || 'Untitled Story'}</h3>
                   <StatusBadge status={story.status} />
                 </div>
-                <p className="text-sm font-medium mb-3" style={{ color: 'var(--primary-color)' }}>{story.employeeName} &bull; {story.designation}</p>
+                <p className="text-sm font-medium mb-3" style={{ color: 'var(--primary-color)' }}>{user?.name || story.author?.full_name}</p>
                 <p className="text-[var(--grey-font-color)] text-sm leading-relaxed line-clamp-2">
-                  {story.journey || 'No content provided yet.'}
+                  {story.content?.journey || 'No content provided yet.'}
                 </p>
               </div>
               <div className="shrink-0 flex items-center">
