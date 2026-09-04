@@ -74,8 +74,10 @@ async def get_current_user(request: Request, credentials: Optional[HTTPAuthoriza
     if settings.DEV_MODE:
         dev_email = request.headers.get("X-Dev-Email")
         if dev_email:
-            # Bypass JWT, synthesize UserInfo
-            return UserInfo(email=dev_email, user_id="123e4567-e89b-12d3-a456-426614174000", username="Dev User")
+            # Bypass JWT, synthesize UserInfo dynamically based on email
+            mock_user_id = f"mock-{dev_email}"
+            mock_username = dev_email.split('@')[0].replace('.', ' ').title()
+            return UserInfo(email=dev_email, user_id=mock_user_id, username=mock_username)
             
     if not credentials:
         raise HTTPException(status_code=401, detail="Not authenticated", headers={"WWW-Authenticate": "Bearer"})

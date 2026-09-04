@@ -12,7 +12,7 @@ apiClient.interceptors.request.use(async (config) => {
     // Dev Bypass Check
     const isBypass = import.meta.env.VITE_AUTH_BYPASS === 'true';
     if (isBypass) {
-        config.headers['X-Dev-Email'] = import.meta.env.VITE_DEV_EMAIL || 'mock.dev@tricon.com';
+        config.headers['X-Dev-Email'] = localStorage.getItem('devEmail') || import.meta.env.VITE_DEV_EMAIL || 'mock.dev@tricon.com';
         return config;
     }
 

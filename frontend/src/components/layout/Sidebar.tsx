@@ -1,12 +1,23 @@
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function Sidebar() {
+  const { role } = useAuth();
+
   const navItems = [
     { label: 'Home', path: '/app' },
     { label: 'My Stories', path: '/app/stories' },
     { label: 'Discover', path: '/app/discover' },
     { label: 'Profile', path: '/app/profile' },
   ]
+
+  if (role === 'hr' || role === 'admin') {
+    navItems.push({ label: 'Review Queue', path: '/app/hr/reviews' });
+  }
+
+  if (role === 'admin') {
+    navItems.push({ label: 'Manage Users', path: '/app/admin/users' });
+  }
 
   return (
     <aside 
@@ -18,7 +29,7 @@ export default function Sidebar() {
           <NavLink
             key={item.path}
             to={item.path}
-            end={item.path === '/app'}
+            end={item.path === '/app' || item.path === '/app/stories'}
             className={({ isActive }) => 
               `px-4 py-3 rounded-md transition-colors text-sm font-medium ${
                 isActive 

@@ -5,13 +5,13 @@ import { useAuth } from '../contexts/AuthContext';
 
 const StatusBadge = ({ status }: { status: string }) => {
   switch (status) {
-    case 'APPROVED':
+    case 'approved':
       return <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">Approved</span>;
-    case 'REJECTED':
+    case 'rejected':
       return <span className="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 border border-red-200">Rejected</span>;
-    case 'PENDING_REVIEW':
+    case 'pending':
       return <span className="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">Pending HR Review</span>;
-    case 'DRAFT':
+    case 'draft':
     default:
       return <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">Draft</span>;
   }

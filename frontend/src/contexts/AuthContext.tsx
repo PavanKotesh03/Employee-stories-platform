@@ -63,6 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const logout = () => {
         if (isBypass) {
+            localStorage.removeItem('devEmail');
             window.location.href = '/';
             return;
         }
